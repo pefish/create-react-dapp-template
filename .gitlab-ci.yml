@@ -1,0 +1,49 @@
+image: docker:18-git
+
+stages:
+  - build
+  - build_send
+  - deploy
+  - deploy_send
+
+variables:
+  IMAGE_NAME: gcr.io/$GCP_PROJECT/XXX
+
+build:
+  stage: build
+  script:
+    - docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
+    - docker build  -t $IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
+    - docker push $IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+  only:
+    - master
+
+deploy_to_k8s:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  script:
+    - kubectl --kubeconfig="$KUBE_CONFIG" -n default set image deployment/XXX XXX=$IMAGE_NAME:$CI_COMMIT_SHORT_SHA
+  only:
+    - master
+
+build_send_dingding:
+  stage: build_send
+  image:
+    name: gcr.io/cloud-builders/curl
+    entrypoint: [""]
+  script:
+    - curl -X POST -H "Content-Type:application/json" https://oapi.dingtalk.com/robot/send?access_token=XXX -d "{\"msgtype\":\"text\", \"text\":{\"content\":\"XXX 镜像构建成功！！！ $CI_COMMIT_SHORT_SHA\"}}"
+  only:
+    - master
+
+deploy_send_dingding:
+  stage: deploy_send
+  image:
+    name: gcr.io/cloud-builders/curl
+    entrypoint: [""]
+  script:
+    - curl -X POST -H "Content-Type:application/json" https://oapi.dingtalk.com/robot/send?access_token=XXX -d "{\"msgtype\":\"text\", \"text\":{\"content\":\"XXX 部署成功！！！\"}}"
+  only:
+    - master
