@@ -2,24 +2,27 @@ import React from 'react';
 import { inject, observer } from 'mobx-react';
 import './home.css'
 import {
-  Image, Layout, Menu, Button
+  Image, Layout, Menu, Button, Modal, Input
 } from 'antd';
-import { UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { ToolOutlined } from '@ant-design/icons';
 import HomeStore from '../store/home_store';
-
+import CommonStore from '../store/common_store';
+import ClipboardJS from "clipboard"
 
 const { Sider } = Layout;
 
 
-@inject('homeStore')
+@inject('homeStore', 'commonStore')
 @observer
 export default class Home extends React.Component<{
   homeStore?: HomeStore,
+  commonStore?: CommonStore,
   [x: string]: any,
 }, any> {
 
   componentDidMount() {
     this.props.homeStore!.setMediaListeners()
+    new ClipboardJS('.btn')
   }
 
   selectMenuContent() {
@@ -29,7 +32,6 @@ export default class Home extends React.Component<{
           <div>
             <Button type={`primary`} onClick={async () => {
               await this.props.homeStore!.requestBaidu()
-
             }}>请求百度</Button>
           </div>
           <div style={{
@@ -76,12 +78,69 @@ export default class Home extends React.Component<{
             justifyContent: "space-between",
           }}>
             <div className="click-div" style={{
-              marginRight: 20
-            }}><span onClick={() => {
-              alert("点击登陆")
-            }}>连接钱包</span></div>
-            <div className="click-div"><span>邀请链接</span></div>
+              marginRight: 10
+            }}><span onClick={
+              this.props.commonStore!.user
+                ?
+                () => {
+                  window.open(`https://etherscan.io/address/${this.props.commonStore!.user}`, "_blank")
+                }
+                :
+                async () => {
+                  await this.props.commonStore?.connectWalletConnect()
+                }
+            }>{(this.props.homeStore!.isWeb ? this.props.commonStore!.user : `${this.props.commonStore!.user.substr(0, 3)}...${this.props.commonStore!.user.substring(this.props.commonStore!.user.length - 3)}`) || "连接钱包"}</span></div>
+            {
+              (this.props.commonStore!.user)
+                ?
+                <div style={{
+                  marginRight: 10
+                }}><span>{this.props.commonStore!.userBalance} ETH</span></div>
+                :
+                null
+            }
+            <div className="click-div" style={{
+              marginRight: 10
+            }} onClick={() => {
+              this.props.homeStore!.inviteLinkModalVisible = true
+            }}><span>邀请返佣</span></div>
+            <div className="click-div" onClick={() => {
+              Modal.error({
+                content: "暂未实现"
+              })
+            }}><span style={{
+              color: "red"
+            }}>成为会员</span></div>
           </div>
+          <Modal
+            title="邀请返佣"
+            visible={this.props.homeStore!.inviteLinkModalVisible}
+            footer={null}
+            onCancel={() => {
+              this.props.homeStore!.inviteLinkModalVisible = false
+              this.props.homeStore!.clickMeCopyText = "点我复制"
+            }}
+          >
+            <p>邀请返佣是指他人通过您的邀请链接使用本站任何收费项目，您将可以得到一定比例的返佣。成为会员后，你的返佣比例会得到大幅度提高。</p>
+            <p>例如：A用户使用您的邀请链接使用某付费项目花费了10ETH，如果您的返佣比例是10%，您将立马得到1ETH。</p>
+            <p>返佣比例：<span style={{
+              color: "red",
+              fontWeight: 900
+            }}>{this.props.commonStore!.rebateRate}%</span></p>
+
+            <p>邀请链接：</p>
+            <div style={{
+              display: "flex",
+              flexDirection: "row"
+            }}>
+              <Input readOnly id="invite-link" defaultValue={`${window.location.origin}?invitor=${this.props.commonStore!.user}`} />
+              <Button className="btn" style={{
+                marginLeft: 4
+              }} type="primary" data-clipboard-target="#invite-link" onClick={() => {
+                this.props.homeStore!.clickMeCopyText = "✓"
+              }}>{this.props.homeStore!.clickMeCopyText}</Button>
+            </div>
+          </Modal>
         </div>
         <div className="content">
           <div className="left-space" style={{
@@ -91,7 +150,7 @@ export default class Home extends React.Component<{
             <div style={{
               display: "flex",
               flex: 1,
-              flexDirection: "column"
+              flexDirection: "column",
             }}>
               <div className="content-header" style={{
                 display: this.props.homeStore!.isWeb ? "flex" : "none"
@@ -125,7 +184,7 @@ export default class Home extends React.Component<{
                   theme="light"
                   style={{
                     backgroundColor: "#333",
-                    color: "white"
+                    color: "white",
                   }}
                 >
                   <div className="logo" />
@@ -134,17 +193,8 @@ export default class Home extends React.Component<{
                   }} onSelect={(e) => {
                     this.props.homeStore!.setSelectedMemu(e.key as string)
                   }}>
-                    <Menu.Item key="test1" icon={<UserOutlined />}>
-                      test1
-                    </Menu.Item>
-                    <Menu.Item key="test2" icon={<VideoCameraOutlined />}>
-                      test2
-                    </Menu.Item>
-                    <Menu.Item key="test3" icon={<UploadOutlined />}>
-                      test3
-                    </Menu.Item>
-                    <Menu.Item key="test4" icon={<UserOutlined />}>
-                      test4
+                    <Menu.Item key="test1" icon={<ToolOutlined />}>
+                      代币一键生成
                     </Menu.Item>
                   </Menu>
                 </Sider>

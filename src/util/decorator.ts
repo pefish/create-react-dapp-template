@@ -2,16 +2,18 @@ import { ReturnType } from "./type";
 import {
   Modal
 } from 'antd';
+import CommonStore from "../store/common_store";
 // 使方法调用期间显示全局loading
 export function withGlobalLoading() {
   return (target, name, descriptor) => {
     let fun = descriptor.value;
     descriptor.value = async function (...args) {
+      const commonStore = this instanceof CommonStore ? this : this.commonStore
       try {
-        this.commonStore.globalLoading = true
+        commonStore.globalLoading = true
         return await fun.apply(this, args)
       } finally {
-        this.commonStore.globalLoading = false
+        commonStore.globalLoading = false
       }
     }
 

@@ -62,6 +62,7 @@
 
 .all-menu-content {
   min-height: 800px;
+  border-radius: 10px;
 }
 
 .menu-content {
