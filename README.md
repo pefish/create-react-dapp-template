@@ -1,4 +1,10 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+[Create App](https://github.com/pefish/create-app) 使用的dapp模板
+
+* 目前支持Metamask、WalletConnect两种方式登陆钱包
+* 技术栈采用React、Mobx、Antd等
+
+本模板可以直接运行，后端合约已经部署在Ropston测试网
 
 ## Available Scripts
 
