@@ -66,6 +66,7 @@ export default class CommonStore {
 
     // 如果metamask安装了则立马连接
     if (typeof window["ethereum"] !== 'undefined') {
+      console.log(`window["ethereum"]`, window["ethereum"])
       this.connectMetamask()
     }
   }
@@ -129,6 +130,7 @@ export default class CommonStore {
           })
         })
         this.rebateRate = StringUtil.div_(rebateRate_.toString(), 100)
+        
       })(),
       (async () => {
         console.log("查询会员佣金比例。。。")
@@ -149,7 +151,6 @@ export default class CommonStore {
         })
       })(),
     ])
-
   }
 
   // 授权方主动断开后做什么
