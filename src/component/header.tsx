@@ -18,7 +18,7 @@ export default class Header extends React.Component<{
   [x: string]: any,
 }, any> {
 
-  render () {
+  render() {
     return (
       <div className="suspension" style={{
         display: "flex",
@@ -46,7 +46,19 @@ export default class Header extends React.Component<{
               async () => {
                 await this.props.commonStore?.walletConnect()
               }
-          }>{(this.props.homeStore!.isWeb ? this.props.commonStore!.user : `${this.props.commonStore!.user.substr(0, 3)}...${this.props.commonStore!.user.substring(this.props.commonStore!.user.length - 3)}`) || "连接钱包"}</span></div>
+          }>{
+                this.props.commonStore!.user
+                  ?
+                  (
+                    this.props.homeStore!.isWeb
+                      ?
+                      this.props.commonStore!.user
+                      :
+                      `${this.props.commonStore!.user.substr(0, 3)}...${this.props.commonStore!.user.substring(this.props.commonStore!.user.length - 3)}`
+                  )
+                  :
+                  "连接钱包"
+              }</span></div>
           {
             (this.props.commonStore!.user)
               ?
@@ -63,16 +75,16 @@ export default class Header extends React.Component<{
           }}><span>邀请返佣</span></div>
           {
             this.props.commonStore!.user && this.props.commonStore!.vipInfo && this.props.commonStore!.isVipValid
-            ?
-            <div><span style={{
-              color: "red"
-            }}>{this.props.commonStore!.vipInfo!.type_ === "1" ? "上帝" : "普通会员"}</span></div>
-            :
-            <Link to={"/vip"}>
+              ?
+              <div><span style={{
+                color: "red"
+              }}>{this.props.commonStore!.vipInfo!.type_ === "1" ? "上帝" : "普通会员"}</span></div>
+              :
               <div className="click-div"><span style={{
                 color: "red"
+              }} onClick={() => {
+                this.props.homeStore!.becomeVipModalVisible = true
               }}>成为会员</span></div>
-            </Link>
           }
         </div>
         <Modal
@@ -90,12 +102,12 @@ export default class Header extends React.Component<{
             color: "red",
             fontWeight: 900
           }}>{
-            this.props.commonStore!.user
-            ?
-            `${this.props.commonStore!.isVipValid ? this.props.commonStore!.vipRebateRate : this.props.commonStore!.rebateRate}%`
-            :
-            "连接钱包后查看"
-          }</span></p>
+              this.props.commonStore!.user
+                ?
+                `${this.props.commonStore!.isVipValid ? this.props.commonStore!.vipRebateRate : this.props.commonStore!.rebateRate}%`
+                :
+                "连接钱包后查看"
+            }</span></p>
 
           <p>邀请链接：</p>
           <div style={{
@@ -112,8 +124,30 @@ export default class Header extends React.Component<{
             }}>{this.props.homeStore!.clickMeCopyText}</Button>
           </div>
         </Modal>
+        <Modal
+          title="成为会员"
+          visible={this.props.homeStore!.becomeVipModalVisible}
+          footer={null}
+          onCancel={() => {
+            this.props.homeStore!.becomeVipModalVisible = false
+          }}
+        >
+          <p>本站会员为月费会员，单月 {this.props.commonStore!.tools!.length > 0 ? StringUtil.unShiftedBy_(this.props.commonStore!.tools![0].reward, 18) : 0} ETH，每次只能购买一个月。</p>
+          <p>会员的好处：</p>
+          <p style={{
+            color: "black",
+            fontWeight: 900,
+          }}>1. 使用付费工具只需支付更少的费用。</p>
+          <p style={{
+            color: "black",
+            fontWeight: 900,
+          }}>2. 更高的返佣比例。</p>
+          <Button type="primary" onClick={async () => {
+            this.props.commonStore!.becomeVip()
+          }}>成为会员</Button>
+        </Modal>
       </div>
-      
+
     )
   }
 }

@@ -84,7 +84,12 @@ export default class CommonStore {
       this.coinToolsContractInstance = new this.web3Instance!.eth.Contract(config.coinToolContractAbi, config.coinToolContractAddress);
       await this.afterConnectWalletSuccess()
     });
-    await this.web3Provider.request({ method: 'eth_requestAccounts' });
+    const accounts = await this.web3Provider.request({ method: 'eth_requestAccounts' });
+    this.user = accounts[0]
+    console.log("获取到用户:", this.user)
+    this.web3Instance = new Web3(this.web3Provider as any)
+    this.coinToolsContractInstance = new this.web3Instance!.eth.Contract(config.coinToolContractAbi, config.coinToolContractAddress);
+    await this.afterConnectWalletSuccess()
   }
 
   private async loop() {
@@ -98,42 +103,53 @@ export default class CommonStore {
     // 开启定时器
     this.timerStatus = true
 
+    await Promise.all([
+      (async () => {
+        // 取余额
+        console.log("取余额。。。")
+        this.userBalance = StringUtil.unShiftedBy_(await Util.timeoutWrapperCall(async () => {
+          return await this.web3Instance!.eth.getBalance(this.user)
+        }), 18)
+      })(),
+      (async () => {
+        // 查询会员是否可用
+        console.log("查询会员是否可用。。。")
+        this.isVipValid = await Util.timeoutWrapperCall(async () => {
+          return await this.coinToolsContractInstance!.methods.isVipValid(this.user).call({
+            from: this.user,
+          })
+        })
+      })(),
+      (async () => {
+        // 查询佣金比例
+        console.log("查询佣金比例。。。")
+        const rebateRate_ = await Util.timeoutWrapperCall(async () => {
+          return await this.coinToolsContractInstance!.methods.nomarlRebateRate().call({
+            from: this.user,
+          })
+        })
+        this.rebateRate = StringUtil.div_(rebateRate_.toString(), 100)
+      })(),
+      (async () => {
+        console.log("查询会员佣金比例。。。")
+        const vipRebateRate_ = await Util.timeoutWrapperCall(async () => {
+          return await this.coinToolsContractInstance!.methods.monthVipRebateRate().call({
+            from: this.user,
+          })
+        })
+        this.vipRebateRate = StringUtil.div_(vipRebateRate_.toString(), 100)
+      })(),
+      (async () => {
+        // 查询会员信息
+        console.log("请求会员信息。。。")
+        this.vipInfo = await Util.timeoutWrapperCall(async () => {
+          return await this.coinToolsContractInstance!.methods.vips(this.user).call({
+            from: this.user,
+          })
+        })
+      })(),
+    ])
 
-    // 取余额
-    console.log("取余额。。。")
-    this.userBalance = StringUtil.unShiftedBy_(await Util.timeoutWrapperCall(async () => {
-      return await this.web3Instance!.eth.getBalance(this.user)
-    }), 18)
-    // 查询会员是否可用
-    console.log("查询会员是否可用。。。")
-    this.isVipValid = await Util.timeoutWrapperCall(async () => {
-      return await this.coinToolsContractInstance!.methods.isVipValid(this.user).call({
-        from: this.user,
-      })
-    })
-    // 查询佣金比例
-    console.log("查询佣金比例。。。")
-    const rebateRate_ = await Util.timeoutWrapperCall(async () => {
-      return await this.coinToolsContractInstance!.methods.nomarlRebateRate().call({
-        from: this.user,
-      })
-    })
-    this.rebateRate = StringUtil.div_(rebateRate_.toString(), 100)
-    console.log("查询会员佣金比例。。。")
-    const vipRebateRate_ = await Util.timeoutWrapperCall(async () => {
-      return await this.coinToolsContractInstance!.methods.monthVipRebateRate().call({
-        from: this.user,
-      })
-    })
-    this.vipRebateRate = StringUtil.div_(vipRebateRate_.toString(), 100)
-    // 查询会员信息
-    console.log("请求会员信息。。。")
-    this.vipInfo = await Util.timeoutWrapperCall(async () => {
-      return await this.coinToolsContractInstance!.methods.vips(this.user).call({
-        from: this.user,
-      })
-    })
-    
   }
 
   // 授权方主动断开后做什么

@@ -7,7 +7,6 @@ import CommonStore from '../store/common_store';
 import {
   Spin,
 } from 'antd';
-import Vip from './vip';
 import './index.css'
 
 @inject('commonStore')
@@ -27,7 +26,6 @@ export default class Index extends React.Component<{
         }}>
           <Switch>
             <Route exact path="/home" component={Home} />
-            <Route exact path="/vip" component={Vip} />
             <Route exact path="/" component={Home} />
             <Route component={NotFound} />
           </Switch>

@@ -19,6 +19,7 @@ export default class HomeStore {
   public selectedMenu: string = "test1"
 
   @observable inviteLinkModalVisible: boolean = false
+  @observable becomeVipModalVisible: boolean = false
   @observable clickMeCopyText: string = "点我复制"
 
   constructor (commonStore: CommonStore) {
