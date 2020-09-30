@@ -1,13 +1,4 @@
-.app {
-  text-align: center;
-  background-color: white;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: left;
-  font-size: calc(10px + 2vmin);
-  color: black;
-}
+
 
 @keyframes App-logo-spin {
   from {
@@ -18,26 +9,9 @@
   }
 }
 
-.suspension {
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 100;
-  color: #ccc;
-  background-color: #363636;
-  font-size: 14px;
-  height: 30px;
-  padding-left: 20px;
-  padding-right: 20px;
-}
 
-.content {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: row;
-  color: #333;
-}
+
+
 
 .left-space {
   flex: 1;
@@ -53,12 +27,7 @@
   flex: 8;
 }
 
-.footer {
-  text-align: center;
-  font-size: 14px;
-  margin-top: 20px;
-  margin-bottom: 30px;
-}
+
 
 .all-menu-content {
   min-height: 800px;

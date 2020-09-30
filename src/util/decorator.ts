@@ -8,12 +8,19 @@ export function withGlobalLoading() {
   return (target, name, descriptor) => {
     let fun = descriptor.value;
     descriptor.value = async function (...args) {
-      const commonStore = this instanceof CommonStore ? this : this.commonStore
+      const commonStore: CommonStore = this instanceof CommonStore ? this : this.commonStore
       try {
-        commonStore.globalLoading = true
+        if (commonStore.globalLoadingCount === 0) {
+          commonStore.globalLoading = true
+        }
+        commonStore.globalLoadingCount++
+        
         return await fun.apply(this, args)
       } finally {
-        commonStore.globalLoading = false
+        if (commonStore.globalLoadingCount === 1) {
+          commonStore.globalLoading = false
+        }
+        commonStore.globalLoadingCount--
       }
     }
 
@@ -29,9 +36,10 @@ export function wrapPromise() {
       try {
         return [await fun.apply(this, args), null]
       } catch (err) {
+        console.error(err)
         return await new Promise((resolve, reject) => {
           Modal.error({
-            content: err.message,
+            content: `params: ${JSON.stringify(args)} -> ` + err.message,
             onOk: () => {
               resolve([null, err])
             }

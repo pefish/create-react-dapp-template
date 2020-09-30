@@ -3,7 +3,7 @@ import CommonStore from './common_store';
 import { withGlobalLoading, wrapPromise } from '../util/decorator';
 import HttpRequestUtil from "@pefish/js-util-httprequest"
 import { ReturnType } from '../util/type';
-
+import ClipboardJS from "clipboard"
 
 const isWebMediaString = "(min-width: 996px)"
 export default class HomeStore {
@@ -23,6 +23,10 @@ export default class HomeStore {
 
   constructor (commonStore: CommonStore) {
     this.commonStore = commonStore
+
+    this.setMediaListeners()
+    new ClipboardJS('.btn')
+    this.commonStore!.initForHomePage()
   }
 
   public setMediaListeners () {
