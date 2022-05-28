@@ -1,14 +1,13 @@
 import { observable } from 'mobx';
-import CommonStore from './common_store';
 import { withGlobalLoading, wrapPromise } from '../util/decorator';
 import HttpRequestUtil from "@pefish/js-util-httprequest"
 import { ReturnType } from '../util/type';
 import ClipboardJS from "clipboard"
+import {commonStore} from "./init";
 
 const isWebMediaString = "(min-width: 996px)"
 export default class HomeStore {
 
-  private commonStore: CommonStore
   @observable
   public counter = 0;
 
@@ -22,12 +21,11 @@ export default class HomeStore {
   @observable becomeVipModalVisible: boolean = false
   @observable clickMeCopyText: string = "点我复制"
 
-  constructor (commonStore: CommonStore) {
-    this.commonStore = commonStore
+  constructor () {
 
     this.setMediaListeners()
     new ClipboardJS('.btn')
-    this.commonStore!.initForHomePage()
+    commonStore.initForHomePage()
   }
 
   public setMediaListeners () {
