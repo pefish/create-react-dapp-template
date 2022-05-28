@@ -41,10 +41,4 @@ export default class HomeStore {
   public add () {
     this.counter++
   }
-
-  @withGlobalLoading()
-  @wrapPromise()
-  public async requestBaidu (): Promise<ReturnType> {
-    return await HttpRequestUtil.get("https://www.baidu.com")
-  }
 }
