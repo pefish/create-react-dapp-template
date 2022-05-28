@@ -4,13 +4,9 @@ import {
 } from "react-router-dom";
 import './App.css';
 import { Provider } from 'mobx-react';
-import CommonStore from './store/common_store';
-import HomeStore from './store/home_store';
 import Index from './page/index'
+import {commonStore, homeStore} from "./store/init";
 
-
-const commonStore = new CommonStore()
-const homeStore = new HomeStore(commonStore)
 const stores = {
   commonStore,
   homeStore,

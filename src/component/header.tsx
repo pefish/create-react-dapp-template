@@ -143,7 +143,7 @@ export default class Header extends React.Component<{
             fontWeight: 900,
           }}>2. 更高的返佣比例。</p>
           <Button type="primary" onClick={async () => {
-            this.props.commonStore!.becomeVip()
+            // this.props.commonStore!.becomeVip()
           }}>成为会员</Button>
         </Modal>
       </div>

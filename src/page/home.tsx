@@ -28,11 +28,6 @@ export default class Home extends React.Component<{
     if (this.props.homeStore!.selectedMenu === "test1") {
       return (
         <div className="menu-content">
-          <div>
-            <Button type={`primary`} onClick={async () => {
-              await this.props.homeStore!.requestBaidu()
-            }}>请求百度</Button>
-          </div>
           <div style={{
             display: `flex`,
             flexDirection: `column`,
